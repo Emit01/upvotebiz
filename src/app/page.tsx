@@ -15,12 +15,12 @@ export default async function HomePage() {
 
   return (
     <LandingWithAuth>
-    <div className="min-h-screen bg-[#fbfbfd] font-apple text-[#1d1d1f] antialiased">
+    <div className="relative min-h-screen bg-[#fbfbfd] font-apple text-[#1d1d1f] antialiased">
+      {/* Animated Snoo rain - covers the entire landing page */}
+      <SnooRain />
 
       {/* Hero - Apple-style with Snoo imagery (upvote.biz-like) */}
       <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 pt-11">
-        {/* Animated Snoo rain - diagonal from top-right to bottom-left */}
-        <SnooRain />
 
         <div className="relative z-10 mx-auto flex max-w-[600px] flex-col items-center text-center">
           {/* Main hero Snoo - teeth smile */}
