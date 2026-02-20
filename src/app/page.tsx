@@ -8,8 +8,15 @@ import { LandingWithAuth } from "@/components/landing/LandingWithAuth";
 import { HeroAuthButtons } from "@/components/landing/HeroAuthButtons";
 
 export default async function HomePage() {
-  const session = await getServerSession(authOptions);
-  if (session) redirect("/new-order");
+  try {
+    const session = await getServerSession(authOptions);
+    if (session) redirect("/new-order");
+  } catch (error: any) {
+    // Re-throw Next.js redirect errors so navigation still works
+    if (error?.digest?.startsWith("NEXT_REDIRECT")) throw error;
+    // If session check fails (e.g. DB unreachable), continue rendering landing page
+    console.warn("[page] Session check failed, rendering landing page:", error instanceof Error ? error.message : error);
+  }
   const currencySymbol = await getOption("currency_symbol", "$");
 
   return (

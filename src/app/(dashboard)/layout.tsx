@@ -11,7 +11,13 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
+  let session;
+  try {
+    session = await getServerSession(authOptions);
+  } catch (error) {
+    console.warn("[dashboard] Session check failed:", error instanceof Error ? error.message : error);
+    redirect("/login");
+  }
 
   if (!session) {
     redirect("/login");
@@ -22,14 +28,24 @@ export default async function DashboardLayout({
   }
 
   const uid = (session.user as any).uid;
-  const [ticketsNeedingActionCount, user, currencySymbol] = await Promise.all([
-    prisma.tickets.count({
-      where: { uid, user_read: 0, status: { not: "closed" } },
-    }),
-    prisma.general_users.findUnique({ where: { id: uid }, select: { balance: true } }),
-    getOption("currency_symbol", "$"),
-  ]);
-  const balance = Number(user?.balance ?? 0);
+  let ticketsNeedingActionCount = 0;
+  let balance = 0;
+  let currencySymbol = "$";
+
+  try {
+    const [ticketCount, user, symbol] = await Promise.all([
+      prisma.tickets.count({
+        where: { uid, user_read: 0, status: { not: "closed" } },
+      }),
+      prisma.general_users.findUnique({ where: { id: uid }, select: { balance: true } }),
+      getOption("currency_symbol", "$"),
+    ]);
+    ticketsNeedingActionCount = ticketCount;
+    balance = Number(user?.balance ?? 0);
+    currencySymbol = symbol;
+  } catch (error) {
+    console.warn("[dashboard] Failed to fetch dashboard data:", error instanceof Error ? error.message : error);
+  }
 
   return (
     <div className="font-apple flex min-h-screen bg-[#f5f5f7] dark:bg-surface-secondary text-[#1d1d1f] dark:text-[var(--label-primary)] antialiased">

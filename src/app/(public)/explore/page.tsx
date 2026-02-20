@@ -3,11 +3,20 @@ import { getOption } from "@/lib/options";
 import Link from "next/link";
 
 export default async function PublicExplorePage() {
-  const [categories, services, currencySymbol] = await Promise.all([
-    prisma.categories.findMany({ where: { status: 1 }, orderBy: { sort: "asc" }, select: { id: true, name: true } }),
-    prisma.services.findMany({ where: { status: 1 }, orderBy: { id: "asc" }, select: { id: true, cate_id: true, name: true, price: true, min: true, max: true } }),
-    getOption("currency_symbol", "$"),
-  ]);
+  let categories: { id: number; name: string | null }[] = [];
+  let services: { id: number; cate_id: number | null; name: string | null; price: any; min: number | null; max: number | null }[] = [];
+  let currencySymbol = "$";
+
+  try {
+    [categories, services, currencySymbol] = await Promise.all([
+      prisma.categories.findMany({ where: { status: 1 }, orderBy: { sort: "asc" }, select: { id: true, name: true } }),
+      prisma.services.findMany({ where: { status: 1 }, orderBy: { id: "asc" }, select: { id: true, cate_id: true, name: true, price: true, min: true, max: true } }),
+      getOption("currency_symbol", "$"),
+    ]);
+  } catch (error) {
+    console.warn("[explore] Failed to fetch data:", error instanceof Error ? error.message : error);
+  }
+
   const byCategory = categories.map((c) => ({
     ...c,
     services: services.filter((s) => s.cate_id === c.id),
