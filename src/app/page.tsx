@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { LandingWithAuth } from "@/components/landing/LandingWithAuth";
 import { HeroAuthButtons } from "@/components/landing/HeroAuthButtons";
+import { SnooRain } from "@/components/landing/SnooRain";
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
@@ -18,21 +19,8 @@ export default async function HomePage() {
 
       {/* Hero - Apple-style with Snoo imagery (upvote.biz-like) */}
       <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 pt-11">
-        {/* Floating decorative Snoos - subtle, clean */}
-        <div className="pointer-events-none absolute inset-0 max-w-[980px] mx-auto">
-          <div className="absolute left-[8%] top-[22%] w-16 opacity-40 sm:w-20">
-            <Image src="/images/landing/snoo-wink.png" alt="" width={80} height={80} className="object-contain" />
-          </div>
-          <div className="absolute right-[10%] top-[28%] w-14 opacity-35 sm:w-[72px]">
-            <Image src="/images/landing/snoo-tongue.png" alt="" width={72} height={72} className="object-contain" />
-          </div>
-          <div className="absolute left-[12%] bottom-[30%] w-12 opacity-30 sm:w-14">
-            <Image src="/images/landing/snoo-happy.png" alt="" width={56} height={56} className="object-contain" />
-          </div>
-          <div className="absolute right-[8%] bottom-[25%] w-14 opacity-35 sm:w-16">
-            <Image src="/images/landing/snoo-logo.png" alt="" width={64} height={64} className="object-contain" />
-          </div>
-        </div>
+        {/* Animated Snoo rain - diagonal from top-right to bottom-left */}
+        <SnooRain />
 
         <div className="relative z-10 mx-auto flex max-w-[600px] flex-col items-center text-center">
           {/* Main hero Snoo - teeth smile */}
