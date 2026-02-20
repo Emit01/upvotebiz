@@ -12,13 +12,18 @@ export async function getOption(
     return cached.value;
   }
 
-  const option = await prisma.general_options.findFirst({
-    where: { name },
-  });
+  try {
+    const option = await prisma.general_options.findFirst({
+      where: { name },
+    });
 
-  const value = option?.value ?? defaultValue;
-  optionsCache.set(name, { value, expiry: Date.now() + CACHE_TTL });
-  return value;
+    const value = option?.value ?? defaultValue;
+    optionsCache.set(name, { value, expiry: Date.now() + CACHE_TTL });
+    return value;
+  } catch (error) {
+    console.error(`[options] Failed to fetch option "${name}":`, error);
+    return defaultValue;
+  }
 }
 
 export async function getOptions(
@@ -37,18 +42,22 @@ export async function getOptions(
   }
 
   if (toFetch.length > 0) {
-    const options = await prisma.general_options.findMany({
-      where: { name: { in: toFetch } },
-    });
+    try {
+      const options = await prisma.general_options.findMany({
+        where: { name: { in: toFetch } },
+      });
 
-    for (const opt of options) {
-      if (opt.name) {
-        result[opt.name] = opt.value ?? "";
-        optionsCache.set(opt.name, {
-          value: opt.value ?? "",
-          expiry: Date.now() + CACHE_TTL,
-        });
+      for (const opt of options) {
+        if (opt.name) {
+          result[opt.name] = opt.value ?? "";
+          optionsCache.set(opt.name, {
+            value: opt.value ?? "",
+            expiry: Date.now() + CACHE_TTL,
+          });
+        }
       }
+    } catch (error) {
+      console.error(`[options] Failed to fetch options:`, error);
     }
 
     for (const name of toFetch) {
