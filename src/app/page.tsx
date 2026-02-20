@@ -67,56 +67,61 @@ export default async function HomePage() {
           <h2 className="mb-10 text-center text-[24px] font-semibold tracking-[-0.022em] sm:text-[28px] text-[#1d1d1f] dark:text-[var(--label-primary)]">
             Our services
           </h2>
-          <div className="grid gap-6 sm:grid-cols-3">
+          <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-stretch sm:justify-center">
             {[
               {
                 title: "Post Upvotes & Downvotes",
-                price: `${currencySymbol}0.50`,
-                priceLabel: "per 1K",
-                desc: "Real upvotes or downvotes on posts with dynamic delivery speed (10–900/hr). High-quality engagement, dripfeed support, and optional refill. Ideal for boosting or controlling post visibility.",
+                price: `from ${currencySymbol}0.50/1K`,
+                desc: "Real upvotes or downvotes on posts with dynamic delivery speed. High-quality engagement, dripfeed support, and optional refill.",
                 href: "/explore",
-                featured: true,
+                featured: false,
+                comingSoon: false,
               },
               {
                 title: "Comment Upvotes & Downvotes",
-                price: `${currencySymbol}0.40`,
-                priceLabel: "per 1K",
+                price: `from ${currencySymbol}0.40/1K`,
                 desc: "Targeted engagement on comments. Adjustable speed and volume, reliable delivery. Perfect for highlighting or moderating discussion threads.",
                 href: "/explore",
-                featured: false,
+                featured: true,
+                comingSoon: false,
               },
               {
                 title: "Custom Comments",
-                price: `${currencySymbol}1.00`,
-                priceLabel: "per 1K",
-                desc: "Unique, custom comments from real users. Set delay windows (1–60 min), one comment per line. Package options available. Best for authentic-looking discussions and replies.",
+                price: `from ${currencySymbol}1.00/1K`,
+                desc: "Unique, custom comments from real users. Set delay windows, one comment per line. Best for authentic-looking discussions and replies.",
                 href: "/explore",
                 featured: false,
+                comingSoon: true,
               },
             ].map((card, i) => (
               <div
                 key={i}
-                className={`flex flex-col rounded-2xl border bg-[#fbfbfd] dark:bg-[var(--surface-primary)] p-6 transition-shadow hover:shadow-md ${
+                className={`relative flex w-full max-w-[340px] flex-col items-center overflow-hidden rounded-3xl bg-white px-8 text-center transition-shadow hover:shadow-lg ${
                   card.featured
-                    ? "border-[#0071e3] ring-1 ring-[#0071e3] dark:border-[var(--accent)] dark:ring-[var(--accent)]"
-                    : "border-[#e8e8ed] dark:border-[var(--separator)]"
+                    ? "border-2 border-dashed border-[#0071e3] py-12 sm:-my-4 sm:shadow-md"
+                    : "border border-[#e8e8ed] py-10"
                 }`}
               >
-                <h3 className="text-[18px] font-semibold tracking-[-0.016em] text-[#1d1d1f] dark:text-[var(--label-primary)]">
+                {card.comingSoon && (
+                  <div className="absolute -right-[30px] top-[22px] rotate-45 bg-gradient-to-r from-[#7c5cfc] to-[#a855f7] px-10 py-1">
+                    <span className="text-[11px] font-semibold text-white">Coming soon</span>
+                  </div>
+                )}
+                <h3 className="text-[28px] font-bold leading-tight tracking-[-0.02em] text-[#1d1d1f] sm:text-[32px]">
                   {card.title}
                 </h3>
-                <p className="mt-2 text-[14px] font-medium text-[#0071e3] dark:text-[var(--accent)]">
-                  from {card.price}/{card.priceLabel}
+                <p className="mt-4 text-[16px] font-semibold text-[#0071e3]">
+                  {card.price}
                 </p>
-                <p className="mt-3 text-[12px] leading-relaxed tracking-[-0.01em] text-[#6e6e73] dark:text-[var(--label-secondary)] flex-1">
+                <p className="mt-4 text-[14px] leading-relaxed text-[#6e6e73] flex-1">
                   {card.desc}
                 </p>
                 <Link
                   href={card.href}
-                  className={`mt-6 w-full rounded-full py-2.5 text-center text-[12px] font-medium transition-all ${
+                  className={`mt-8 w-full rounded-full py-3.5 text-center text-[16px] font-semibold transition-all ${
                     card.featured
-                      ? "bg-gradient-to-r from-[#0071e3] to-[#5856d6] text-white hover:opacity-90 dark:from-[var(--accent)] dark:to-[var(--accent)]"
-                      : "border border-[#e8e8ed] bg-[#fbfbfd] text-[#1d1d1f] hover:bg-[#f5f5f7] dark:border-[var(--separator)] dark:bg-[var(--surface-primary)] dark:text-[var(--label-primary)] dark:hover:bg-[var(--surface-secondary)]"
+                      ? "bg-gradient-to-r from-[#7c5cfc] to-[#a855f7] text-white shadow-lg shadow-purple-200 hover:opacity-90"
+                      : "border border-[#e0e0e0] bg-[#f8f8f8] text-[#1d1d1f] hover:bg-[#f0f0f0]"
                   }`}
                 >
                   Get Started
