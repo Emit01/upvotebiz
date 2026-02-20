@@ -1,0 +1,473 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model general_users {
+  id               Int       @id @default(autoincrement())
+  ids              String?   @db.Text
+  login_type       String?   @db.Text
+  first_name       String?   @db.Text
+  last_name        String?   @db.Text
+  email            String?   @db.Text
+  password         String?   @db.Text
+  timezone         String?   @db.Text
+  more_information String?   @db.Text
+  settings         String?   @db.LongText
+  desc             String?   @db.LongText
+  balance          Decimal?  @default(0.0000) @db.Decimal(15, 4)
+  custom_rate      Int       @default(0)
+  api_key          String?
+  spent            String?   @db.VarChar(225)
+  activation_key   String?   @db.Text
+  reset_key        String?   @db.Text
+  history_ip       String?   @db.Text
+  ref_key          String?   @db.VarChar(10)
+  ref_uid          Int?
+  status           Int?      @default(1)
+  changed          DateTime? @db.DateTime(0)
+  created          DateTime? @db.DateTime(0)
+}
+
+model general_users_price {
+  id            Int   @id @default(autoincrement())
+  uid           Int
+  service_id    Int
+  service_price Float
+}
+
+model general_staffs {
+  id             Int       @id @default(autoincrement())
+  ids            String?   @db.Text
+  role_id        Int?
+  admin          Int?
+  login_type     String?   @db.Text
+  first_name     String?   @db.Text
+  last_name      String?   @db.Text
+  email          String?   @db.Text
+  password       String?   @db.Text
+  timezone       String?   @db.Text
+  settings       String?   @db.LongText
+  activation_key String?   @db.Text
+  reset_key      String?   @db.Text
+  history_ip     String?   @db.Text
+  status         Int?      @default(1)
+  changed        DateTime? @db.DateTime(0)
+  created        DateTime? @db.DateTime(0)
+}
+
+model categories {
+  id      Int       @id @default(autoincrement())
+  ids     String?   @db.Text
+  uid     Int?
+  name    String?   @db.Text
+  desc    String?   @db.Text
+  image   String?   @db.Text
+  sort    Int?
+  status  Int?      @default(1)
+  created DateTime? @db.DateTime(0)
+  changed DateTime? @db.DateTime(0)
+}
+
+model services {
+  id              Int                @id @default(autoincrement())
+  ids             String?            @db.Text
+  uid             Int?
+  cate_id         Int?
+  name            String?            @db.Text
+  desc            String?            @db.Text
+  price           Decimal?           @db.Decimal(15, 4)
+  original_price  Decimal?           @db.Decimal(15, 4)
+  deny_duplicates Int?               @default(0)
+  refill          Int                @default(0)
+  refill_type     Boolean            @default(false)
+  min             Int?
+  max             Int?
+  add_type        services_add_type? @default(manual)
+  type            String?            @default("default") @db.VarChar(100)
+  api_service_id  String?            @db.VarChar(200)
+  api_provider_id Int?
+  dripfeed        Int?               @default(0)
+  status          Int?               @default(1)
+  changed         DateTime?          @db.DateTime(0)
+  created         DateTime?          @db.DateTime(0)
+}
+
+model orders {
+  delay1              Int                @default(0) @db.TinyInt
+  delay2              Int                @default(0) @db.TinyInt
+  id                  Int                @id @default(autoincrement())
+  ids                 String?            @db.Text
+  type                orders_type        @default(direct)
+  cate_id             String?
+  service_id          String?
+  main_order_id       Int?
+  service_type        String?            @default("default") @db.VarChar(50)
+  api_provider_id     Int?
+  api_service_id      String?            @db.VarChar(200)
+  api_order_id        Int?               @default(0)
+  uid                 String?
+  link                String?            @db.VarChar(3000)
+  quantity            String?
+  usernames           String?            @db.Text
+  username            String?            @db.Text
+  hashtags            String?            @db.Text
+  hashtag             String?            @db.Text
+  media               String?            @db.Text
+  comments            String?            @db.Text
+  sub_posts           Int?
+  sub_min             Int?
+  sub_max             Int?
+  sub_delay           Int?
+  sub_expiry          String?            @db.Text
+  sub_response_orders String?            @db.Text
+  sub_response_posts  String?            @db.Text
+  sub_status          orders_sub_status?
+  charge              Decimal?           @db.Decimal(15, 4)
+  formal_charge       Decimal?           @db.Decimal(15, 4)
+  profit              Decimal?           @db.Decimal(15, 4)
+  status              orders_status?     @default(pending)
+  start_counter       String?
+  start_counter2      String?
+  remains             String?            @default("0")
+  is_drip_feed        Int?               @default(0)
+  runs                Int?               @default(0)
+  interval            Int?               @default(0)
+  dripfeed_quantity   String?            @default("0")
+  refill              Int?               @default(0)
+  refill_status       Int?
+  refill_date         DateTime?          @db.DateTime(0)
+  note                String?            @db.Text
+  is_position         Boolean?
+  position            Int?
+  position_time       Int                @default(0)
+  position_upvotes    Int                @default(0)
+  changed             DateTime?          @db.DateTime(0)
+  created             DateTime?          @db.DateTime(0)
+  Heartbeat           BigInt             @default(0) @db.UnsignedBigInt
+  Server              Int                @default(0) @db.TinyInt
+  delay_order         Int                @default(0)
+}
+
+model api_providers {
+  id            Int       @id @default(autoincrement()) @db.UnsignedInt
+  ids           String?   @db.Text
+  uid           Int?
+  name          String?   @db.Text
+  url           String?   @db.VarChar(255)
+  key           String?   @db.Text
+  type          String    @default("standard") @db.VarChar(100)
+  balance       Decimal?  @db.Decimal(15, 5)
+  currency_code String?   @db.VarChar(10)
+  description   String?   @db.Text
+  status        Int       @default(1)
+  created       DateTime? @db.DateTime(0)
+  changed       DateTime? @db.DateTime(0)
+
+  @@index([uid], map: "tickets_user_id_foreign")
+}
+
+model general_transaction_logs {
+  id             Int       @id @default(autoincrement())
+  ids            String?   @db.Text
+  uid            Int?
+  payer_email    String?   @db.VarChar(255)
+  type           String?   @db.Text
+  transaction_id String?   @db.Text
+  txn_fee        Float?
+  note           String?   @db.Text
+  data           String?   @db.Text
+  amount         Float?    @db.Float
+  status         Int?      @default(1)
+  created        DateTime? @db.DateTime(0)
+}
+
+model payments {
+  id        Int     @id @default(autoincrement())
+  type      String? @db.VarChar(255)
+  name      String  @db.VarChar(225)
+  min       Float
+  max       Float
+  sort      Int?
+  new_users Int     @default(0)
+  status    Int     @default(1)
+  params    String  @db.Text
+}
+
+model payments_bonus {
+  id         Int     @id @default(autoincrement())
+  ids        String? @db.VarChar(100)
+  payment_id Int
+  bonus_from Float
+  percentage Float
+  status     Int     @default(1)
+}
+
+model general_options {
+  id    Int     @id @default(autoincrement())
+  name  String? @db.Text
+  value String? @db.LongText
+}
+
+model general_news {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  ids         String?   @db.Text
+  uid         Int?
+  type        String?   @db.VarChar(255)
+  description String?   @db.Text
+  status      Int?      @default(1)
+  created     DateTime? @db.DateTime(0)
+  expiry      DateTime? @db.DateTime(0)
+  changed     DateTime? @db.DateTime(0)
+
+  @@index([uid], map: "tickets_user_id_foreign")
+}
+
+model tickets {
+  id          Int            @id @default(autoincrement()) @db.UnsignedInt
+  ids         String?        @db.Text
+  uid         Int?
+  description String?        @db.Text
+  subject     String?        @db.VarChar(255)
+  status      tickets_status @default(pending)
+  user_read   Float          @default(0)
+  admin_read  Float          @default(1)
+  created     DateTime?      @db.DateTime(0)
+  changed     DateTime?      @db.DateTime(0)
+
+  @@index([uid], map: "tickets_user_id_foreign")
+}
+
+model ticket_messages {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  ids       String?   @db.Text
+  uid       Int?
+  author    String?   @db.VarChar(200)
+  support   Int?      @default(0)
+  ticket_id Int?
+  message   String    @db.Text
+  is_read   Boolean?
+  changed   DateTime? @db.DateTime(0)
+  created   DateTime? @db.DateTime(0)
+
+  @@index([ticket_id], map: "ticket_messages_ticket_id_foreign")
+  @@index([uid], map: "ticket_messages_user_id_foreign")
+}
+
+model faqs {
+  id       Int       @id @default(autoincrement())
+  ids      String?   @db.Text
+  uid      Int?
+  question String?   @db.Text
+  answer   String?   @db.LongText
+  sort     Int?
+  status   Int?      @default(1)
+  created  DateTime? @db.DateTime(0)
+  changed  DateTime? @db.DateTime(0)
+}
+
+model general_lang {
+  id        Int     @id @default(autoincrement())
+  ids       String? @db.VarChar(100)
+  lang_code String? @db.VarChar(10)
+  slug      String? @db.Text
+  value     String? @db.Text
+}
+
+model general_lang_list {
+  id           Int       @id @default(autoincrement())
+  ids          String?   @db.VarChar(225)
+  code         String?   @db.VarChar(10)
+  country_code String?   @db.VarChar(225)
+  is_default   Int?
+  status       Int?
+  created      DateTime? @db.DateTime(0)
+}
+
+model general_custom_page {
+  id          Int       @id @default(autoincrement())
+  ids         String?   @db.Text
+  pid         Int?      @default(1)
+  position    Int?      @default(0)
+  name        String?   @db.Text
+  slug        String?   @db.Text
+  image       String?   @db.Text
+  description String?   @db.LongText
+  content     String?   @db.LongText
+  status      Int?      @default(1)
+  changed     DateTime? @db.DateTime(0)
+  created     DateTime? @db.DateTime(0)
+}
+
+model affiliate {
+  id                Int       @id @default(autoincrement())
+  uid               Int?
+  visit             Int?      @default(0) @db.MediumInt
+  referral          Int?      @default(0)
+  registration      Int?      @default(0)
+  total_earning     Decimal?  @default(0.00000) @db.Decimal(15, 5)
+  available_earning Decimal?  @db.Decimal(15, 5)
+  status            Int       @default(1)
+  note              String?   @db.Text
+  changed           DateTime? @db.DateTime(0)
+  created           DateTime? @db.DateTime(0)
+}
+
+model affiliate_payout {
+  id           Int                      @id @default(autoincrement())
+  ids          String?                  @db.Text
+  uid          Int?
+  mode         Int?                     @default(0)
+  status       affiliate_payout_status? @default(pending)
+  affiliate_id Int?
+  amount       Decimal?                 @db.Decimal(6, 0)
+  note         String?                  @db.Text
+  changed      DateTime?                @db.DateTime(0)
+  created      DateTime?                @db.DateTime(0)
+}
+
+model general_subscribers {
+  id         Int       @id @default(autoincrement())
+  ids        String?   @db.Text
+  first_name String?   @db.Text
+  last_name  String?   @db.Text
+  email      String?   @db.Text
+  ip         String?   @db.Text
+  country    String?   @db.VarChar(255)
+  changed    DateTime? @db.DateTime(0)
+  created    DateTime? @db.DateTime(0)
+}
+
+model general_file_manager {
+  id           Int       @id @default(autoincrement())
+  ids          String?   @db.Text
+  uid          Int?
+  file_name    String?   @db.Text
+  file_type    String?   @db.Text
+  file_ext     String?   @db.Text
+  file_size    String?   @db.Text
+  is_image     String?   @db.Text
+  image_width  Int?
+  image_height Int?
+  created      DateTime? @db.DateTime(0)
+}
+
+model general_purchase {
+  id            Int     @id @default(autoincrement())
+  ids           String? @db.Text
+  pid           String? @db.Text
+  purchase_code String? @db.Text
+  version       String? @db.Text
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model accounts {
+  feed_correlation_id      String @db.Text
+  account_name             String @db.Text
+  loid                     String @db.LongText
+  token_v2                 String @db.LongText
+  session_tracker          String @db.LongText
+  proxy                    String @db.Text
+  device_name              String @db.Text
+  p_device_id              String @db.Text
+  android_version          String @db.Text
+  x_dev_ad_id              String @map("x-dev-ad-id") @db.Text
+  user_agent               String @db.Text
+  original_loid            String @db.Text
+  original_token_v2        String @db.Text
+  original_session_tracker String @db.Text
+  original_reddit_session  String @db.Text
+  client_vendor_id         String @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model general_sessions {
+  id         String @db.VarChar(128)
+  ip_address String @db.VarChar(45)
+  timestamp  Int    @default(0) @db.UnsignedInt
+  data       Bytes  @db.Blob
+
+  @@index([timestamp], map: "ci_sessions_timestamp")
+  @@ignore
+}
+
+model profile_scan {
+  id             Int                   @id @default(autoincrement())
+  uid            Int?
+  username       String?               @db.VarChar(255)
+  category       profile_scan_category @default(upvotes)
+  no_of_upvotes  Int                   @default(0)
+  no_of_upvotes2 Int                   @default(0)
+  rank           String?               @db.VarChar(255)
+  rank2          String                @db.VarChar(255)
+  position_time  Int
+  speed          Float                 @default(0.25) @db.Float
+  whitelist      String                @db.LongText
+  blacklist      String                @db.LongText
+  API_key        String?               @db.VarChar(255)
+  created_at     DateTime              @default(now()) @db.Timestamp(0)
+  service_id     Int                   @default(2)
+}
+
+model users {
+  id       Int    @id @default(autoincrement())
+  username String @db.VarChar(255)
+  password String @db.VarChar(255)
+  email    String @db.VarChar(255)
+}
+
+enum orders_type {
+  direct
+  api
+}
+
+enum orders_status {
+  active
+  completed
+  processing
+  inprogress
+  pending
+  partial
+  canceled
+  refunded
+  awaiting
+  error
+  fail
+}
+
+enum orders_sub_status {
+  Active
+  Paused
+  Completed
+  Expired
+  Canceled
+}
+
+enum services_add_type {
+  manual
+  api
+}
+
+enum tickets_status {
+  new
+  pending
+  closed
+  answered
+}
+
+enum affiliate_payout_status {
+  pending  @map("pending")
+  rejected @map("rejected")
+  approved @map("approved")
+}
+
+enum profile_scan_category {
+  upvotes
+  rank
+}
