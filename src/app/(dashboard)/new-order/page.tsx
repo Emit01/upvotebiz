@@ -84,8 +84,9 @@ const LOG_STATUS_VALUES: orders_status[] = ["completed", "inprogress", "pending"
 export default async function NewOrderPage({
   searchParams,
 }: {
-  searchParams: { log_status?: string; p?: string };
+  searchParams: Promise<{ log_status?: string; p?: string }>;
 }) {
+  const resolvedSearchParams = await searchParams;
   const session = await getServerSession(authOptions);
   const uid = session!.user.uid;
   const uidStr = String(uid);
@@ -94,10 +95,10 @@ export default async function NewOrderPage({
     getOption("currency_symbol", "$"),
   ]);
 
-  const logStatus = (LOG_STATUSES as readonly string[]).includes(searchParams.log_status || "")
-    ? searchParams.log_status
+  const logStatus = (LOG_STATUSES as readonly string[]).includes(resolvedSearchParams.log_status || "")
+    ? resolvedSearchParams.log_status
     : "all";
-  const logPage = Math.max(1, parseInt(searchParams.p || "1"));
+  const logPage = Math.max(1, parseInt(resolvedSearchParams.p || "1"));
   const logSkip = (logPage - 1) * LOG_PAGE_SIZE;
 
   const logWhere: { uid: string; status?: orders_status } = { uid: uidStr };

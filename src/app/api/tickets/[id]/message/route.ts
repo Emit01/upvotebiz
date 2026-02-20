@@ -6,9 +6,10 @@ import { ids } from "@/lib/utils";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params;
     const session = await getServerSession(authOptions);
     if (!session) {
       return NextResponse.json({ status: "error", message: "Unauthorized" }, { status: 401 });
@@ -18,7 +19,7 @@ export async function POST(
       return NextResponse.json({ status: "error", message: "Unauthorized" }, { status: 401 });
     }
 
-    const ticketId = parseInt(params.id, 10);
+    const ticketId = parseInt(resolvedParams.id, 10);
     if (!ticketId) {
       return NextResponse.json({ status: "error", message: "Invalid ticket." }, { status: 400 });
     }

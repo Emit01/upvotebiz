@@ -7,11 +7,12 @@ const STATUSES = ["all", "pending", "answered", "closed"];
 export default async function AdminTicketsPage({
   searchParams,
 }: {
-  searchParams: { status?: string; search?: string; page?: string };
+  searchParams: Promise<{ status?: string; search?: string; page?: string }>;
 }) {
-  const status = searchParams.status || "all";
-  const search = searchParams.search || "";
-  const page = Math.max(1, parseInt(searchParams.page || "1"));
+  const resolvedSearchParams = await searchParams;
+  const status = resolvedSearchParams.status || "all";
+  const search = resolvedSearchParams.search || "";
+  const page = Math.max(1, parseInt(resolvedSearchParams.page || "1"));
 
   const where: any = {};
   if (status !== "all") where.status = status;

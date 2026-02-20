@@ -13,10 +13,11 @@ const statusLabels: Record<string, string> = {
   new: "New",
 };
 
-export default async function TicketPage({ params }: { params: { id: string } }) {
+export default async function TicketPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
   const session = await getServerSession(authOptions);
   const uid = session!.user.uid;
-  const id = parseInt(params.id, 10);
+  const id = parseInt(resolvedParams.id, 10);
   if (!id) notFound();
 
   const ticket = await prisma.tickets.findFirst({

@@ -8,13 +8,14 @@ const PAGE_SIZE = 20;
 export default async function AdminOrdersPage({
   searchParams,
 }: {
-  searchParams: { status?: string; search?: string; field?: string; page?: string };
+  searchParams: Promise<{ status?: string; search?: string; field?: string; page?: string }>;
 }) {
+  const resolvedSearchParams = await searchParams;
   const currencySymbol = await getOption("currency_symbol", "$");
-  const status = searchParams.status || "all";
-  const search = searchParams.search || "";
-  const field = searchParams.field || "all";
-  const page = Math.max(1, parseInt(searchParams.page || "1"));
+  const status = resolvedSearchParams.status || "all";
+  const search = resolvedSearchParams.search || "";
+  const field = resolvedSearchParams.field || "all";
+  const page = Math.max(1, parseInt(resolvedSearchParams.page || "1"));
 
   const where: any = {
     NOT: [

@@ -5,11 +5,12 @@ import AdminServicesClient from "@/components/admin/AdminServicesClient";
 export default async function AdminServicesPage({
   searchParams,
 }: {
-  searchParams: { category?: string; search?: string };
+  searchParams: Promise<{ category?: string; search?: string }>;
 }) {
+  const resolvedSearchParams = await searchParams;
   const currencySymbol = await getOption("currency_symbol", "$");
-  const categoryFilter = searchParams.category || "all";
-  const search = searchParams.search || "";
+  const categoryFilter = resolvedSearchParams.category || "all";
+  const search = resolvedSearchParams.search || "";
 
   const categories = await prisma.categories.findMany({
     orderBy: { sort: "asc" },

@@ -7,12 +7,13 @@ const PAGE_SIZE = 20;
 export default async function AdminDripfeedPage({
   searchParams,
 }: {
-  searchParams: { status?: string; search?: string; page?: string };
+  searchParams: Promise<{ status?: string; search?: string; page?: string }>;
 }) {
+  const resolvedSearchParams = await searchParams;
   const currencySymbol = await getOption("currency_symbol", "$");
-  const status = searchParams.status || "all";
-  const search = searchParams.search || "";
-  const page = Math.max(1, parseInt(searchParams.page || "1"));
+  const status = resolvedSearchParams.status || "all";
+  const search = resolvedSearchParams.search || "";
+  const page = Math.max(1, parseInt(resolvedSearchParams.page || "1"));
 
   const where: any = { is_drip_feed: 1 };
   if (status !== "all") where.status = status;

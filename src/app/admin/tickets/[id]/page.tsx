@@ -2,8 +2,9 @@ import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import AdminTicketThreadClient from "@/components/admin/AdminTicketThreadClient";
 
-export default async function AdminTicketDetailPage({ params }: { params: { id: string } }) {
-  const ticketId = parseInt(params.id);
+export default async function AdminTicketDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  const ticketId = parseInt(resolvedParams.id);
   if (isNaN(ticketId)) notFound();
 
   const ticket = await prisma.tickets.findUnique({ where: { id: ticketId } });

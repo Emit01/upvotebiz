@@ -21,13 +21,14 @@ const statusLabels: Record<string, string> = {
 export default async function TicketsPage({
   searchParams,
 }: {
-  searchParams: { status?: string; p?: string };
+  searchParams: Promise<{ status?: string; p?: string }>;
 }) {
+  const resolvedSearchParams = await searchParams;
   const session = await getServerSession(authOptions);
   const uid = session!.user.uid;
 
-  const filterStatus = searchParams.status;
-  const page = Math.max(1, parseInt(searchParams.p || "1"));
+  const filterStatus = resolvedSearchParams.status;
+  const page = Math.max(1, parseInt(resolvedSearchParams.p || "1"));
   const skip = (page - 1) * ITEMS_PER_PAGE;
 
   const where: { uid: number; status?: tickets_status } = { uid };

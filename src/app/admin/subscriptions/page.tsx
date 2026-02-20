@@ -7,10 +7,11 @@ const PAGE_SIZE = 20;
 export default async function AdminSubscriptionsPage({
   searchParams,
 }: {
-  searchParams: { page?: string };
+  searchParams: Promise<{ page?: string }>;
 }) {
+  const resolvedSearchParams = await searchParams;
   const currencySymbol = await getOption("currency_symbol", "$");
-  const page = Math.max(1, parseInt(searchParams.page || "1"));
+  const page = Math.max(1, parseInt(resolvedSearchParams.page || "1"));
 
   const where = { service_type: "subscriptions" as const };
   const [orders, total] = await Promise.all([

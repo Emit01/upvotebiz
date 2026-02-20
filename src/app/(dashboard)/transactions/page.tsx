@@ -10,8 +10,9 @@ const ITEMS_PER_PAGE = 20;
 export default async function TransactionsPage({
   searchParams,
 }: {
-  searchParams: { status?: string; p?: string };
+  searchParams: Promise<{ status?: string; p?: string }>;
 }) {
+  const resolvedSearchParams = await searchParams;
   const session = await getServerSession(authOptions);
   const uid = session!.user.uid;
   const [currencySymbol, user] = await Promise.all([
@@ -20,8 +21,8 @@ export default async function TransactionsPage({
   ]);
   const balance = Number(user?.balance ?? 0);
 
-  const filterStatus = searchParams.status ? parseInt(searchParams.status) : undefined;
-  const page = Math.max(1, parseInt(searchParams.p || "1"));
+  const filterStatus = resolvedSearchParams.status ? parseInt(resolvedSearchParams.status) : undefined;
+  const page = Math.max(1, parseInt(resolvedSearchParams.p || "1"));
   const skip = (page - 1) * ITEMS_PER_PAGE;
 
   const where: any = { uid };

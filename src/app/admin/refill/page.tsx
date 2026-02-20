@@ -7,11 +7,12 @@ const PAGE_SIZE = 20;
 export default async function AdminRefillPage({
   searchParams,
 }: {
-  searchParams: { status?: string; page?: string };
+  searchParams: Promise<{ status?: string; page?: string }>;
 }) {
+  const resolvedSearchParams = await searchParams;
   const currencySymbol = await getOption("currency_symbol", "$");
-  const status = searchParams.status || "all";
-  const page = Math.max(1, parseInt(searchParams.page || "1"));
+  const status = resolvedSearchParams.status || "all";
+  const page = Math.max(1, parseInt(resolvedSearchParams.page || "1"));
 
   const where: any = { refill: 1 };
   if (status !== "all") {
