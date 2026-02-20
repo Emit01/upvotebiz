@@ -2,22 +2,29 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getOption } from "@/lib/options";
+import { isDatabaseReachable } from "@/lib/prisma";
 import Link from "next/link";
 import Image from "next/image";
 import { LandingWithAuth } from "@/components/landing/LandingWithAuth";
 import { HeroAuthButtons } from "@/components/landing/HeroAuthButtons";
 
 export default async function HomePage() {
-  try {
-    const session = await getServerSession(authOptions);
-    if (session) redirect("/new-order");
-  } catch (error: any) {
-    // Re-throw Next.js redirect errors so navigation still works
-    if (error?.digest?.startsWith("NEXT_REDIRECT")) throw error;
-    // If session check fails (e.g. DB unreachable), continue rendering landing page
-    console.warn("[page] Session check failed, rendering landing page:", error instanceof Error ? error.message : error);
+  const dbAvailable = await isDatabaseReachable();
+
+  if (dbAvailable) {
+    try {
+      const session = await getServerSession(authOptions);
+      if (session) redirect("/new-order");
+    } catch (error: any) {
+      // Re-throw Next.js redirect errors so navigation still works
+      if (error?.digest?.startsWith("NEXT_REDIRECT")) throw error;
+      console.warn("[page] Session check failed:", error instanceof Error ? error.message : error);
+    }
   }
-  const currencySymbol = await getOption("currency_symbol", "$");
+
+  const currencySymbol = dbAvailable
+    ? await getOption("currency_symbol", "$")
+    : "$";
 
   return (
     <LandingWithAuth>

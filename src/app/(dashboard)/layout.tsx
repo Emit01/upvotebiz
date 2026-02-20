@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import prisma, { isDatabaseReachable } from "@/lib/prisma";
 import { getOption } from "@/lib/options";
 import Sidebar from "@/components/layout/Sidebar";
 import DashboardHeader from "@/components/layout/DashboardHeader";
@@ -11,6 +11,12 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const dbAvailable = await isDatabaseReachable();
+
+  if (!dbAvailable) {
+    redirect("/login");
+  }
+
   let session;
   try {
     session = await getServerSession(authOptions);
