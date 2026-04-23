@@ -5,8 +5,10 @@ import prisma from "@/lib/prisma";
 import { getOption } from "@/lib/options";
 import type { orders_status } from "@prisma/client";
 import Link from "next/link";
-import { formatDate, getStatusColor, getStatusLabel, currencyFormat } from "@/lib/utils";
+import { getStatusColor, getStatusLabel, currencyFormat } from "@/lib/utils";
+import { LocalTime } from "@/components/LocalTime";
 import NewOrderForm from "@/components/dashboard/NewOrderForm";
+import DashboardTablePagination from "@/components/dashboard/DashboardTablePagination";
 
 async function getCachedCatalog() {
   return unstable_cache(
@@ -95,9 +97,11 @@ export default async function NewOrderPage({
     getOption("currency_symbol", "$"),
   ]);
 
-  const logStatus = (LOG_STATUSES as readonly string[]).includes(resolvedSearchParams.log_status || "")
-    ? resolvedSearchParams.log_status
-    : "all";
+  const rawLogStatus = resolvedSearchParams.log_status;
+  const logStatus =
+    rawLogStatus !== undefined && (LOG_STATUSES as readonly string[]).includes(rawLogStatus)
+      ? rawLogStatus
+      : "all";
   const logPage = Math.max(1, parseInt(resolvedSearchParams.p || "1"));
   const logSkip = (logPage - 1) * LOG_PAGE_SIZE;
 
@@ -125,7 +129,6 @@ export default async function NewOrderPage({
   }
 
   const logTotalPages = Math.ceil(logTotal / LOG_PAGE_SIZE);
-  const logBaseUrl = logStatus !== "all" ? `/new-order?log_status=${logStatus}` : "/new-order";
 
   return (
     <div className="flex flex-col flex-1 min-h-0 w-full gap-6">
@@ -197,50 +200,19 @@ export default async function NewOrderPage({
                         {getStatusLabel(order.status || "")}
                       </span>
                     </td>
-                    <td className="px-3 py-2 text-right text-[13px] text-[var(--label-tertiary)]">{formatDate(order.created)}</td>
+                    <td className="px-3 py-2 text-right text-[13px] text-[var(--label-tertiary)]"><LocalTime date={order.created instanceof Date ? order.created.toISOString() : (order.created ?? undefined)} /></td>
                   </tr>
                 ))
               )}
             </tbody>
           </table>
         </div>
-        {logTotalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-[var(--separator)] px-4 py-2.5 flex-shrink-0">
-            <p className="text-[12px] font-medium text-[var(--label-tertiary)]">
-              Page {logPage} of {logTotalPages}
-            </p>
-            <div className="flex items-center gap-1">
-              {logPage > 1 && (
-                <Link href={`${logBaseUrl}${logBaseUrl.includes("?") ? "&" : "?"}p=${logPage - 1}`} className="rounded px-2.5 py-1 text-[12px] font-medium text-[var(--label-secondary)] hover:bg-[var(--surface-secondary)]">
-                  Prev
-                </Link>
-              )}
-              {(() => {
-                const maxShow = 5;
-                const start = logTotalPages <= maxShow ? 1 : Math.max(1, Math.min(logPage - 1, logTotalPages - maxShow + 1));
-                const end = Math.min(logTotalPages, start + maxShow - 1);
-                const pages: number[] = [];
-                for (let i = start; i <= end; i++) pages.push(i);
-                return pages.map((p) => (
-                  <Link
-                    key={p}
-                    href={`${logBaseUrl}${logBaseUrl.includes("?") ? "&" : "?"}p=${p}`}
-                    className={`rounded px-2.5 py-1 text-[12px] font-medium min-w-[1.5rem] text-center ${
-                      p === logPage ? "bg-[var(--accent)] text-white" : "text-[var(--label-secondary)] hover:bg-[var(--surface-secondary)]"
-                    }`}
-                  >
-                    {p}
-                  </Link>
-                ));
-              })()}
-              {logPage < logTotalPages && (
-                <Link href={`${logBaseUrl}${logBaseUrl.includes("?") ? "&" : "?"}p=${logPage + 1}`} className="rounded px-2.5 py-1 text-[12px] font-medium text-[var(--label-secondary)] hover:bg-[var(--surface-secondary)]">
-                  Next
-                </Link>
-              )}
-            </div>
-          </div>
-        )}
+        <DashboardTablePagination
+          tone="new-order"
+          page={logPage}
+          totalPages={logTotalPages}
+          logStatus={logStatus}
+        />
       </div>
     </div>
   );

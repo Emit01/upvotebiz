@@ -2,8 +2,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
-import { formatDate, getStatusColor, getStatusLabel, currencyFormat } from "@/lib/utils";
+import { getStatusColor, getStatusLabel, currencyFormat } from "@/lib/utils";
+import { LocalTime } from "@/components/LocalTime";
 import { getOption } from "@/lib/options";
+import DashboardTablePagination from "@/components/dashboard/DashboardTablePagination";
 
 const ITEMS_PER_PAGE = 15;
 const ORDER_STATUSES = ["all", "pending", "inprogress", "processing", "completed", "partial", "canceled", "refunded"];
@@ -51,7 +53,6 @@ export default async function OrdersPage({
   }
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
-  const baseUrl = `/orders?status=${status}${query ? `&query=${encodeURIComponent(query)}` : ""}`;
 
   return (
     <div className="flex flex-col flex-1 min-h-0 w-full gap-4">
@@ -124,42 +125,20 @@ export default async function OrdersPage({
                         {getStatusLabel(order.status || "")}
                       </span>
                     </td>
-                    <td className="px-3 py-2 text-right text-[13px] text-label-tertiary">{formatDate(order.created)}</td>
+                    <td className="px-3 py-2 text-right text-[13px] text-label-tertiary"><LocalTime date={order.created?.toISOString()} /></td>
                   </tr>
                 ))
               )}
             </tbody>
           </table>
         </div>
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-separator px-4 py-2.5 flex-shrink-0">
-            <p className="text-[12px] font-medium text-label-tertiary">Page {page} of {totalPages}</p>
-            <div className="flex items-center gap-1">
-              {page > 1 && (
-                <Link href={`${baseUrl}${baseUrl.includes("?") ? "&" : "?"}p=${page - 1}`} className="rounded px-2.5 py-1 text-[12px] font-medium text-label-secondary hover:bg-surface-secondary">Prev</Link>
-              )}
-              {(() => {
-                const maxShow = 5;
-                const start = totalPages <= maxShow ? 1 : Math.max(1, Math.min(page - 1, totalPages - maxShow + 1));
-                const end = Math.min(totalPages, start + maxShow - 1);
-                const pages: number[] = [];
-                for (let i = start; i <= end; i++) pages.push(i);
-                return pages.map((p) => (
-                  <Link
-                    key={p}
-                    href={`${baseUrl}${baseUrl.includes("?") ? "&" : "?"}p=${p}`}
-                    className={`rounded px-2.5 py-1 text-[12px] font-medium min-w-[1.5rem] text-center ${p === page ? "bg-[var(--accent)] text-white" : "text-label-secondary hover:bg-surface-secondary"}`}
-                  >
-                    {p}
-                  </Link>
-                ));
-              })()}
-              {page < totalPages && (
-                <Link href={`${baseUrl}${baseUrl.includes("?") ? "&" : "?"}p=${page + 1}`} className="rounded px-2.5 py-1 text-[12px] font-medium text-label-secondary hover:bg-surface-secondary">Next</Link>
-              )}
-            </div>
-          </div>
-        )}
+        <DashboardTablePagination
+          tone="orders"
+          page={page}
+          totalPages={totalPages}
+          status={status}
+          query={query}
+        />
       </div>
     </div>
   );
